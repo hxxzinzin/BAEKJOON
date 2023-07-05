@@ -1,0 +1,63 @@
+// branch and bound 알고리즘의 대표적 문제 -> 거스름돈 문제
+// 수업시간에 배운 세뱃돈 문제의 코드 차용함.
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+void pick(int* items, int n, int* picked, int m, int toPick, int total, int *count) {
+    int lastIndex, i, smallest;
+    int sum = 0;
+    int min_count = 0;
+
+    lastIndex = m - toPick - 1;
+    for (i = 0; i <= lastIndex; i++) // 지금까지 뽑은 애들의 총합
+        sum = sum + items[picked[i]];
+
+    if (sum > total) // 지금까지 뽑은 애들이 최종 원하는 값보다 크면
+        return;
+
+    if (sum == total) { // 봉지의 최소 개수를 구해야 함
+        for (i = 0; i <= lastIndex; i++)
+            min_count++; // 이거 문제였음. 밑에 count를 5001로 바꾸고 이 코드를 변경하니까 잘 나오게 됨
+
+        if (*count > min_count)
+            *count = min_count;
+
+        min_count = 0;
+        return;
+    }
+
+    if (toPick == 0) // 6개를 다 뽑았는데 원하는 값보다 적을 때 이므로 답이 아님. 따라서 ret.
+        return;
+
+    if (m == toPick)
+        smallest = 0;
+    else
+        smallest = picked[lastIndex];
+
+    for (i = smallest; i < n; i++) {
+        picked[lastIndex + 1] = i;
+        pick(items, n, picked, m, toPick - 1, total, count);
+    }
+}
+
+int main() {
+    int items[] = { 3, 5 };
+    int* picked;
+    int n;
+    int count = 5001;
+
+    scanf("%d", &n);
+
+    picked = (int*)malloc(sizeof(int) * n);
+
+    pick(items, 2, picked, n, n, n, &count);
+
+    if (count == 5001)
+        printf("-1\n");
+    else
+        printf("%d\n", count);
+
+    free(picked);
+    return 0;
+}
